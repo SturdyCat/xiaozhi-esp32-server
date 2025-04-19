@@ -17,8 +17,8 @@ server:
     # 固件上的token和以下的token如果能对应，才能连接本服务端
     tokens:
       - token: "your-token1" # 设备1的token
-        name: "your-device-name1"  # 设备1标识
-      - token: "your-token2"  # 设备2的token
+        name: "your-device-name1" # 设备1标识
+      - token: "your-token2" # 设备2的token
         name: "your-device-name2" # 设备2标识
     # 可选:设备白名单，如果设置了白名单，那么白名单的机器无论是什么token都可以连接。
     #allowed_devices:
@@ -92,7 +92,11 @@ plugins:
   # 这个密钥是项目共用的key，用多了可能会被限制
   # 想稳定一点就自行申请替换，每天有1000次免费调用
   # 申请地址：https://console.qweather.com/#/apps/create-key/over
-  get_weather: { "api_key": "a861d0d5e7bf4ee1a83d9a9e4f96d4da", "default_location": "广州" }
+  get_weather:
+    {
+      "api_key": "a861d0d5e7bf4ee1a83d9a9e4f96d4da",
+      "default_location": "广州",
+    }
   # 获取新闻插件的配置，这里根据需要的新闻类型传入对应的url链接，默认支持社会、科技、财经新闻
   # 更多类型的新闻列表查看 https://www.chinanews.com.cn/rss/
   get_news:
@@ -107,8 +111,12 @@ plugins:
       - 卧室,台灯,switch.iot_cn_831898993_socn1_on_p_2_1
     base_url: http://homeassistant.local:8123
     api_key: 你的home assistant api访问令牌
+  dlna_play_music:
+    dms_name: # 音乐服务器名称(支持模糊查询)，将从此服务器搜索音乐文件地址，留空将选择第搜索到的第一个设为服务器
+    dmr_name: # 音乐播放设备名称(支持模糊查询)，将音乐推送到此设备进行播放，留空将选择第搜索到的第一个设为播放设备
+    refresh_time: 300 # 刷新音乐列表的时间间隔，单位为秒
   play_music:
-    music_dir: "./music"  # 音乐文件存放路径，将从该目录及子目录下搜索音乐文件
+    music_dir: "./music" # 音乐文件存放路径，将从该目录及子目录下搜索音乐文件
     music_ext: # 音乐文件类型，p3格式效率最高
       - ".mp3"
       - ".wav"
@@ -175,12 +183,15 @@ Intent:
       - change_role
       - get_weather
       - get_news
-      # play_music是服务器自带的音乐播放，hass_play_music是通过home assistant控制的独立外部程序音乐播放
-      # 如果用了hass_play_music，就不要开启play_music，两者只留一个
+      # 1. play_music 是服务器自带的音乐播放
+      # 2. hass_play_music 是通过 home assistant 控制的独立外部程序音乐播放
+      # 3. dlna_play_music 是通过 dlna dms 服务获取 music 推送到 dlna dmr 设备进行音乐播放
+      # 三种方式都可以播放音乐，只能选择一种方式
       - play_music
-      #- hass_get_state
-      #- hass_set_state
-      #- hass_play_music
+      # - dlna_play_music
+      # - hass_get_state
+      # - hass_set_state
+      # - hass_play_music
 
 Memory:
   mem0ai:
@@ -225,7 +236,7 @@ VAD:
     type: silero
     threshold: 0.5
     model_dir: models/snakers4_silero-vad
-    min_silence_duration_ms: 700  # 如果说话停顿比较长，可以把这个值设置大一些
+    min_silence_duration_ms: 700 # 如果说话停顿比较长，可以把这个值设置大一些
 
 LLM:
   # 所有openai类型均可以修改超参，以AliLLM为例
@@ -237,11 +248,11 @@ LLM:
     base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
     model_name: qwen-turbo
     api_key: 你的deepseek web key
-    temperature: 0.7  # 温度值
-    max_tokens: 500   # 最大生成token数
-    top_p: 1         
-    top_k: 50        
-    frequency_penalty: 0  # 频率惩罚
+    temperature: 0.7 # 温度值
+    max_tokens: 500 # 最大生成token数
+    top_p: 1
+    top_k: 50
+    frequency_penalty: 0 # 频率惩罚
   AliAppLLM:
     # 定义LLM API类型
     type: AliBL
@@ -249,7 +260,7 @@ LLM:
     app_id: 你的app_id
     # 可在这里找到你的 api_key https://bailian.console.aliyun.com/?apiKey=1#/api-key
     api_key: 你的api_key
-    # 是否不使用本地prompt：true|false (默不用请在百练应用中设置prompt) 
+    # 是否不使用本地prompt：true|false (默不用请在百练应用中设置prompt)
     is_no_prompt: true
     # Ali_memory_id：false（不使用）|你的memory_id（请在百练应用中设置中获取）
     # Tips！：Ali_memory未实现多用户存储记忆(记忆按id调用)
@@ -283,7 +294,7 @@ LLM:
     # 定义LLM API类型
     type: ollama
     model_name: qwen2.5 #  使用的模型名称，需要预先使用ollama pull下载
-    base_url: http://localhost:11434  # Ollama服务地址
+    base_url: http://localhost:11434 # Ollama服务地址
   DifyLLM:
     # 定义LLM API类型
     type: dify
@@ -303,7 +314,7 @@ LLM:
     # 若部署地无法访问接口，需要开启科学上网
     api_key: 你的gemini web key
     model_name: "gemini-2.0-flash"
-    http_proxy: ""  #"http://127.0.0.1:10808"
+    http_proxy: "" #"http://127.0.0.1:10808"
     https_proxy: "" #http://127.0.0.1:10808"
   CozeLLM:
     # 定义LLM API类型
@@ -335,14 +346,14 @@ LLM:
     # 定义LLM API类型
     type: xinference
     # Xinference服务地址和模型名称
-    model_name: qwen2.5:72b-AWQ  # 使用的模型名称，需要预先在Xinference启动对应模型
-    base_url: http://localhost:9997  # Xinference服务地址
+    model_name: qwen2.5:72b-AWQ # 使用的模型名称，需要预先在Xinference启动对应模型
+    base_url: http://localhost:9997 # Xinference服务地址
   XinferenceSmallLLM:
     # 定义轻量级LLM API类型，用于意图识别
     type: xinference
     # Xinference服务地址和模型名称
-    model_name: qwen2.5:3b-AWQ  # 使用的小模型名称，用于意图识别
-    base_url: http://localhost:9997  # Xinference服务地址
+    model_name: qwen2.5:3b-AWQ # 使用的小模型名称，用于意图识别
+    base_url: http://localhost:9997 # Xinference服务地址
 TTS:
   # 当前支持的type为edge、doubao，可自行适配
   EdgeTTS:
@@ -395,8 +406,8 @@ TTS:
     output_dir: tmp/
     response_format: wav
     reference_id: null
-    reference_audio: ["/tmp/test.wav",]
-    reference_text: ["你弄来这些吟词宴曲来看，还是这些混话来欺负我。",]
+    reference_audio: ["/tmp/test.wav"]
+    reference_text: ["你弄来这些吟词宴曲来看，还是这些混话来欺负我。"]
     normalize: true
     max_new_tokens: 1024
     chunk_length: 200
@@ -585,13 +596,13 @@ TTS:
     # 要求接口使用GET方式请求，并返回音频文件
     type: custom
     url: "http://127.0.0.1:9880/tts"
-    params: # 自定义请求参数
+    params:# 自定义请求参数
       # text: "{prompt_text}" # {prompt_text}会被替换为实际的提示词内容
       # speaker: jok老师
       # speed: 1
       # foo: bar
       # testabc: 123456
-    headers: # 自定义请求头
+    headers:# 自定义请求头
       # Authorization: Bearer xxxx
     format: wav # 接口返回的音频格式
     output_dir: tmp/
